@@ -1,0 +1,88 @@
+﻿@page "/holidaydetails/{data}"
+@using Newtonsoft.Json;
+@using CountryHolidays.Service.Models
+<a href="holidays" style="text-decoration:none; color:black; display:flex; align-items:center; font-size:2em; margin-bottom:1em;">
+    <div>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="black" class="bi bi-arrow-left-square-fill" viewBox="0 0 24 24">
+            <path d="M16 14a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2zm-4.5-6.5H5.707l2.147-2.146a.5.5 0 1 0-.708-.708l-3 3a.5.5 0 0 0 0 .708l3 3a.5.5 0 0 0 .708-.708L5.707 8.5H11.5a.5.5 0 0 0 0-1" />
+        </svg>
+    </div>
+    <div>Holidays</div>
+</a>
+
+<PageTitle>@Holiday.Name</PageTitle>
+
+    <h3>@Holiday.Name</h3>
+<table class="table">
+    <tbody>
+        <tr>
+            <td>Date</td>
+            <td>@Holiday.Date.ToShortDateString()</td>
+        </tr>
+        <tr>
+            <td>Local name</td>
+            <td>@Holiday.LocalName</td>
+        </tr>
+        <tr>
+            <td>Fixed</td>
+            <td>@Holiday.Fixed</td>
+        </tr>
+        <tr>
+            <td>Global</td>
+            <td>@Holiday.Global</td>
+        </tr>
+        <tr>
+            <td>Counties</td>
+            <td>
+                <div class="grid-container">
+                    @if (@Holiday.Counties is null)
+                    {
+
+                    }
+                    else
+                    {
+                        @foreach (var county in @Holiday.Counties)
+                        {
+                            <p class="grid-item">@county</p>
+                        }
+                    }
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Launch year</td>
+            <td>@Holiday.LaunchYear</td>
+        </tr>
+        <tr>
+            <td>Types</td>
+            <td>
+                <p>
+                    @if (@Holiday.Types is null)
+                    {
+
+                    }
+                    else
+                    {
+                        @foreach (var holidayType in @Holiday.Types)
+                        {
+                            @holidayType
+                        }
+                    }
+                </p>
+            </td>
+        </tr>
+
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public string Data { get; set; }
+
+    public CountryHoliday Holiday { get; set; }
+    protected override void OnInitialized()
+    {
+        Holiday = JsonConvert.DeserializeObject<CountryHoliday>(Data);
+    }
+
+}

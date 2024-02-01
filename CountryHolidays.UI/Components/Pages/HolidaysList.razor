@@ -1,0 +1,61 @@
+﻿@page "/holidays"
+@using CountryHolidays.UI.Components.Layout;
+@using CountryHolidays.Service;
+@inject ICountryHolidayService CountryHolidayService;
+<PageTitle>Holidays</PageTitle>
+
+<div style="display:flex; justify-content:space-between; align-items: center">
+    <h1>Holidays</h1>
+    <div style="display:flex; justify-content: space-between; gap:10px;">
+        <div>
+            @* <label for="year">Select Year:</label> *@
+            <select id="year" @onchange="YearChanged" value="@SelectedYear">
+                @foreach (var year in AvailableYears)
+                {
+                    <option value="@year">@year</option>
+                }
+            </select>
+        </div>
+
+        <div>
+            @* <label for="country">Select Country:</label> *@
+            <select id="country" @onchange="CountryChanged" value="@SelectedCountry" size="1" style="height:1.5rem">
+                @foreach (var country in AvailableCountries)
+                {
+                    <option value="@country.CountryCode">@country.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+
+</div>
+<HolidaysTable CountryCode="@SelectedCountry" Year="@SelectedYear" />
+@code {
+    private int NumberOfYears = 5;
+
+    private IEnumerable<int> AvailableYears = Enumerable.Range(DateTime.Now.Year-4, 5);
+    private IEnumerable<Country> AvailableCountries { get; set; } = new List<Country>();
+    private string SelectedCountry { get; set; } = "US";
+    private int SelectedYear { get; set; } = DateTime.Now.Year;
+
+    
+    protected override async Task OnInitializedAsync()
+    {
+        AvailableCountries = await CountryHolidayService.GetAvailableCountriesAsync();
+    }
+    
+    private void YearChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value.ToString(), out int selectedYear))
+        {
+            SelectedYear = selectedYear;
+        }
+    }
+
+    private void CountryChanged(ChangeEventArgs e)
+    {
+        SelectedCountry = e.Value.ToString();
+    }
+
+
+}

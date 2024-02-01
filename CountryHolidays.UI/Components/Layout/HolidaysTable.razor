@@ -1,0 +1,72 @@
+﻿@using CountryHolidays.Service.Models;
+@using CountryHolidays.Service
+@using Newtonsoft.Json
+@inject ICountryHolidayService countryHolidayService;
+@inject NavigationManager NavigationManager;
+
+
+@if (CountryHolidays == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in CountryHolidays)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Date.ToShortDateString()</td>
+                    <td>
+                        @foreach (var holidayType in @item?.Types)
+                        {
+                            <li style="list-style:none">@holidayType</li>
+                        }
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-primary" @onclick="@(() => ShowDetails(item))">
+                            Details
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    public IEnumerable<CountryHoliday> CountryHolidays { get; set; }
+
+    [Parameter] public int Year { get; set; } = DateTime.Now.Year;
+    [Parameter] public string CountryCode { get; set; } = "US";
+
+
+    private async Task LoadHolidaysAsync()
+    {
+        CountryHolidays = await countryHolidayService.GetHolidaysAsync(Year, CountryCode);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        CountryHolidays = new List<CountryHoliday>();
+        await LoadHolidaysAsync();
+    }
+    private void ShowDetails(CountryHoliday item)
+    {
+        string data = JsonConvert.SerializeObject(item);
+        Console.WriteLine(data);
+        NavigationManager.NavigateTo($"/holidaydetails/{data}");
+
+    }
+
+}
